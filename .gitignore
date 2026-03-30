@@ -1,0 +1,25 @@
+# =========================
+# .NET / C# Ignore Rules
+# =========================
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+*.suo
+appsettings.Development.json
+
+# =========================
+# Angular / Node Ignore Rules
+# =========================
+node_modules/
+dist/
+.angular/
+npm-debug.log
+yarn-error.log
+
+# =========================
+# OS / Environment Rules
+# =========================
+.DS_Store
+Thumbs.db
+.env

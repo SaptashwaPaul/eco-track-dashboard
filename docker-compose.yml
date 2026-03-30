@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: ecotrack_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Password123!
+      POSTGRES_DB: EcotrackDB
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: 
+      context: ./EcoTrack # Path to your .NET folder
+      dockerfile: Dockerfile
+    container_name: ecotrack_api
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5050:5050"
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=EcotrackDB;Username=postgres;Password=Password123!
+
+  web:
+    build:
+      context: ./eco-track-ui # Path to your Angular folder
+      dockerfile: Dockerfile
+    container_name: ecotrack_web
+    depends_on:
+      - api
+    ports:
+      - "4200:80" # Maps localhost:4200 to NGINX's port 80
+
+volumes:
+  postgres_data:
