@@ -56,7 +56,16 @@ app.MapHub<DisruptionHub>("/hubs/disruptions");
 // Seed Database 
 using (var scope = app.Services.CreateScope())
 {
-    await EcoTrack.Infrastructure.Persistence.EcoTrackDbSeeder.SeedAsync(scope.ServiceProvider);
+    var services = scope.ServiceProvider;
+
+    // 1. Grab the database context
+    var context = services.GetRequiredService<EcoTrack.Infrastructure.Persistence.EcoTrackDbContext>();
+
+    // 2. Automatically apply all pending EF Core migrations (creates the tables!)
+    await Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.MigrateAsync(context.Database);
+
+    // 3. Now that tables exist, seed the data
+    await EcoTrackDbSeeder.SeedAsync(services);
 }
 
 app.Run();
